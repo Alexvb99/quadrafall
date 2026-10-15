@@ -51,7 +51,15 @@ class Theme:
     nes_levels: bool = False    # colores que cambian con el nivel, como el NES
     pattern: str | None = None  # "bricks", "dots", "stripes" o None
     default_style: str = "bevel"
+    default_font: str = "pixel"
     shine: Color = (252, 252, 252)
+    panel_border: int = 3       # grosor del borde de los paneles (0 = sin borde)
+    frame_width: int = 4        # grosor del marco del tablero
+    ornaments: bool = True      # sombras en títulos y piezas decorativas en el menú
+
+    def shadow(self, amount: float = 0.5) -> Color | None:
+        """Color de la sombra de los títulos, o None si el tema no usa sombras."""
+        return darken(self.background2, amount) if self.ornaments else None
 
     def block_colors(self, kind: str, level: int, style: str) -> tuple[Color, Color]:
         """(relleno, borde) de un bloque. Con el tema NES, T/O/I son bloques
@@ -101,6 +109,14 @@ THEMES: dict[str, Theme] = {
         text_dim=(140, 120, 150), accent=(230, 120, 160), pattern="stripes", default_style="rounded",
         pieces={"I": (130, 210, 230), "O": (250, 220, 120), "T": (200, 160, 230), "S": (150, 220, 150),
                 "Z": (245, 150, 150), "J": (140, 170, 240), "L": (250, 180, 120)},
+    ),
+    "minimal": Theme(  # liso, en grises, sin bordes ni adornos
+        key="minimal", background=(246, 246, 244), background2=(246, 246, 244), board=(246, 246, 244),
+        grid=(238, 238, 236), frame=(205, 205, 202), panel=(246, 246, 244), text=(40, 40, 40),
+        text_dim=(150, 150, 148), accent=(40, 40, 40), default_style="flat", default_font="smooth",
+        panel_border=0, frame_width=1, ornaments=False,
+        pieces={"I": (45, 45, 45), "O": (150, 150, 150), "T": (85, 85, 85), "S": (120, 120, 120),
+                "Z": (100, 100, 100), "J": (65, 65, 65), "L": (135, 135, 135)},
     ),
     "colorblind": Theme(  # paleta Okabe-Ito, distinguible con daltonismo
         key="colorblind", background=(30, 30, 30), background2=(12, 12, 12), board=(0, 0, 0),

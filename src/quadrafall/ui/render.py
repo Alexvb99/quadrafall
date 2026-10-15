@@ -79,7 +79,8 @@ class Renderer:
 
     def panel(self, surf, rect: pygame.Rect, theme: Theme, title: str | None = None) -> None:
         pygame.draw.rect(surf, theme.panel, rect, border_radius=6)
-        pygame.draw.rect(surf, theme.frame, rect, width=3, border_radius=6)
+        if theme.panel_border:
+            pygame.draw.rect(surf, theme.frame, rect, width=theme.panel_border, border_radius=6)
         if title:
             self.text.draw(surf, title, (rect.centerx, rect.y + 10), theme.text, 2, align="center")
 
@@ -213,9 +214,11 @@ class Renderer:
             surf.fill(darken(theme.frame, 0.2), (rect.x, sy, rect.w, cell - 2))
             surf.fill(lighten(theme.frame, 0.3), (rect.x, sy, rect.w, 3))
 
-        frame = rect.inflate(12, 12)
-        pygame.draw.rect(surf, theme.frame, frame, width=4, border_radius=4)
-        pygame.draw.rect(surf, darken(theme.frame, 0.5), rect.inflate(4, 4), width=2)
+        if theme.frame_width >= 3:
+            pygame.draw.rect(surf, theme.frame, rect.inflate(12, 12), width=theme.frame_width, border_radius=4)
+            pygame.draw.rect(surf, darken(theme.frame, 0.5), rect.inflate(4, 4), width=2)
+        elif theme.frame_width > 0:
+            pygame.draw.rect(surf, theme.frame, rect.inflate(8, 8), width=theme.frame_width)
 
     # --- marcadores -----------------------------------------------------------
 

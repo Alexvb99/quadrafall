@@ -70,6 +70,7 @@ STRINGS: dict[str, tuple[str, str]] = {
     "theme_modern": ("Neón", "Neon"),
     "theme_gameboy": ("Portátil verde", "Green handheld"),
     "theme_pastel": ("Pastel", "Pastel"),
+    "theme_minimal": ("Minimalista", "Minimal"),
     "theme_colorblind": ("Apto para daltonismo", "Colorblind-friendly"),
     "block_style": ("Estilo de bloque", "Block style"),
     "style_nes": ("NES", "NES"),
@@ -105,8 +106,10 @@ STRINGS: dict[str, tuple[str, str]] = {
     "help_randomizer": ("NES: puede haber rachas sin una pieza. Bolsa de 7: cada 7 piezas salen "
                         "las 7 distintas.",
                         "NES: droughts are possible. 7-bag: every 7 pieces contain all 7 shapes."),
-    "help_lock_delay": ("Tiempo para mover la pieza tras tocar el suelo. 0 = como el NES.",
-                        "Time to move the piece after it lands. 0 = like the NES."),
+    "help_lock_delay": ("Margen mínimo para mover la pieza cuando ya está apoyada, aunque bajes rápido. "
+                        "0 = como el NES.",
+                        "Minimum time to move a piece once it has landed, even when dropping fast. "
+                        "0 = like the NES."),
     "help_das": ("Fotogramas con la dirección pulsada antes de que la pieza se desplace sola. NES: 16.",
                  "Frames holding a direction before auto-shift starts. NES: 16."),
     "help_arr": ("Fotogramas entre pasos del autodesplazamiento. NES: 6. 0 = hasta la pared.",

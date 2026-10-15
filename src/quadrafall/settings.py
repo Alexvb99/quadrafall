@@ -15,13 +15,14 @@ from .paths import config_dir
 PRESETS: dict[str, dict] = {
     "nes": {
         "rules": dict(rotation="nes", randomizer="nes", hold=False, next_count=1, hard_drop=False,
-                      lock_delay=0, das=16, arr=6, soft_drop_frames=2, entry_delay=-1,
+                      lock_delay=0, lock_resets=0, das=16, arr=6, soft_drop_frames=2, entry_delay=-1,
                       line_clear_frames=20),
         "visual": dict(ghost=False),
     },
     "nes_plus": {
+        # Como el NES, pero con al menos 1/3 s apoyada para colar la pieza en un hueco.
         "rules": dict(rotation="nes_plus", randomizer="nes", hold=True, next_count=3, hard_drop=True,
-                      lock_delay=0, das=12, arr=4, soft_drop_frames=2, entry_delay=-1,
+                      lock_delay=20, lock_resets=6, das=12, arr=4, soft_drop_frames=2, entry_delay=-1,
                       line_clear_frames=20),
         "visual": dict(ghost=True),
     },
@@ -91,6 +92,10 @@ class Settings:
                 self.data = _merge(DEFAULTS, json.load(fh))
         except (OSError, ValueError):
             self.data = copy.deepcopy(DEFAULTS)
+        # Un estilo predefinido siempre usa sus valores actuales (si se retocan en una
+        # nueva versión, los jugadores que lo tengan elegido reciben el cambio).
+        if self.data["preset"] in PRESETS:
+            self.apply_preset(self.data["preset"])
         return self
 
     def save(self) -> None:

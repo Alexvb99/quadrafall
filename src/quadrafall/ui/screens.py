@@ -16,7 +16,7 @@ from .menu import (NAV_ACCEPT, NAV_BACK, NAV_DELETE, NAV_DOWN, NAV_LEFT, NAV_RIG
                    Item, MenuScene, NavReader, Range, Scene, Toggle)
 from .play import MODE_LABELS, GameScene
 from .render import H, W, format_time
-from .themes import BLOCK_STYLES, CLEAR_ANIMATIONS, THEMES, darken
+from .themes import BLOCK_STYLES, CLEAR_ANIMATIONS, THEMES
 
 
 def _frames(v: int) -> str:
@@ -72,7 +72,7 @@ class TitleScene(MenuScene):
         app = self.app
         theme, txt, visual = app.theme, app.text, app.settings.visual
         self.draw_background(surf)
-        for kind, x, y, _ in self.falling:
+        for kind, x, y, _ in (self.falling if theme.ornaments else []):
             app.renderer.piece_icon(surf, kind, (x, int(y)), 22, theme, visual["block_style"],
                                     (self.frame // 600) % 10, "srs")
         # Logo con cada letra del color de una pieza
@@ -82,7 +82,7 @@ class TitleScene(MenuScene):
         x = W // 2 - width // 2
         for i, ch in enumerate(title):
             color, _ = theme.block_colors(PIECES[i % len(PIECES)], (self.frame // 600) % 10, "flat")
-            rect = txt.draw(surf, ch, (x, 60), color, scale, shadow=darken(theme.background2, 0.6))
+            rect = txt.draw(surf, ch, (x, 60), color, scale, shadow=theme.shadow(0.6))
             x = rect.right + scale
         txt.draw(surf, t("subtitle"), (W // 2, 180), theme.text_dim, 2, align="center")
         self.draw_items(surf)
@@ -178,8 +178,10 @@ class AppearanceScene(OptionsSubScene):
         v = s.visual
 
         def set_theme(key):
+            # Cada tema trae su estilo de bloque y su fuente; luego se pueden cambiar.
             s.set_visual("theme", key)
             s.set_visual("block_style", THEMES[key].default_style)
+            set_font(THEMES[key].default_font)
 
         def setter(key):
             return lambda value: s.set_visual(key, value)
@@ -350,7 +352,7 @@ class ControlsScene(Scene):
         theme, txt = app.theme, app.text
         app.renderer.background(surf, theme)
         txt.draw(surf, t("controls"), (W // 2, 40), theme.text, 6, align="center",
-                 shadow=darken(theme.background2, 0.5))
+                 shadow=theme.shadow(0.5))
         panel = pygame.Rect(80, 120, W - 160, 520)
         app.renderer.panel(surf, panel, theme)
         col_x = [600, 825, 1050]
@@ -421,7 +423,7 @@ class ScoresScene(Scene):
         theme, txt = app.theme, app.text
         app.renderer.background(surf, theme)
         txt.draw(surf, t("highscores"), (W // 2, 40), theme.text, 6, align="center",
-                 shadow=darken(theme.background2, 0.5))
+                 shadow=theme.shadow(0.5))
         txt.draw(surf, f"< {t(MODE_LABELS[self.mode])} >", (W // 2, 120), theme.accent, 3, align="center")
         panel = pygame.Rect(120, 170, W - 240, 460)
         app.renderer.panel(surf, panel, theme)
@@ -492,7 +494,7 @@ class NameEntryScene(Scene):
         theme, txt = app.theme, app.text
         app.renderer.background(surf, theme)
         txt.draw(surf, t("new_record"), (W // 2, 150), theme.accent, 6, align="center",
-                 shadow=darken(theme.background2, 0.5))
+                 shadow=theme.shadow(0.5))
         txt.draw(surf, f"{t('score')} {self.entry['score']}", (W // 2, 260), theme.text, 3, align="center")
         txt.draw(surf, t("enter_name"), (W // 2, 340), theme.text_dim, 3, align="center")
         box = pygame.Rect(0, 0, 520, 70)

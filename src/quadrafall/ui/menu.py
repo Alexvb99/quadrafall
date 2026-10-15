@@ -9,7 +9,7 @@ import pygame
 
 from ..i18n import has, t
 from .render import H, W
-from .themes import darken, mix
+from .themes import mix
 
 
 class Scene:
@@ -249,7 +249,7 @@ class MenuScene(Scene):
         txt = self.app.text
         self.draw_background(surf)
         if self.title_key:
-            txt.draw(surf, t(self.title_key), (W // 2, 50), theme.text, 6, align="center", shadow=darken(theme.background2, 0.5))
+            txt.draw(surf, t(self.title_key), (W // 2, 50), theme.text, 6, align="center", shadow=theme.shadow(0.5))
         self.draw_items(surf)
         self.draw_help(surf)
 
@@ -267,15 +267,18 @@ class MenuScene(Scene):
         overlay = pygame.Surface(panel.size, pygame.SRCALPHA)
         overlay.fill((*theme.panel, 215))
         surf.blit(overlay, panel)
-        pygame.draw.rect(surf, theme.frame, panel, width=3, border_radius=6)
+        if theme.panel_border:
+            pygame.draw.rect(surf, theme.frame, panel, width=theme.panel_border, border_radius=6)
         for row, index in enumerate(range(self.scroll, min(len(self.items), self.scroll + visible))):
             item = self.items[index]
             rect = pygame.Rect(area.x, area.y + row * self.row_h, area.w, self.row_h - 6)
             self._rects.append((index, rect))
             selected = index == self.selected
             if selected:
-                pygame.draw.rect(surf, mix(theme.panel, theme.accent, 0.25), rect, border_radius=4)
-                pygame.draw.rect(surf, theme.accent, rect, width=2, border_radius=4)
+                pygame.draw.rect(surf, mix(theme.panel, theme.accent, 0.25 if theme.panel_border else 0.08), rect,
+                                 border_radius=4)
+                if theme.panel_border:
+                    pygame.draw.rect(surf, theme.accent, rect, width=2, border_radius=4)
             color = theme.text if selected else theme.text_dim
             value = item.value_text()
             ty = rect.y + (rect.h - 30) // 2

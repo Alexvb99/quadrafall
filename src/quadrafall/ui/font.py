@@ -138,9 +138,13 @@ class PixelFont:
 
 
 class SmoothFont:
-    """Alternativa con la fuente vectorial incluida en pygame."""
+    """Alternativa con la fuente vectorial incluida en pygame. Las flechas, que esa
+    fuente no trae, se dibujan con los glifos de la fuente pixelada."""
 
-    def __init__(self):
+    PIXEL_ONLY = "←→↑↓"
+
+    def __init__(self, pixel: PixelFont):
+        self.pixel = pixel
         self._fonts: dict[int, pygame.font.Font] = {}
         self._cache: dict[tuple, pygame.Surface] = {}
 
@@ -153,8 +157,18 @@ class SmoothFont:
         return (GLYPH_H + TOP) * scale
 
     def size(self, text: str, scale: int) -> tuple[int, int]:
-        w, _ = self._font(scale).size(text)
-        return w, self.line_height(scale)
+        return self.render(text, (0, 0, 0), scale).get_width(), self.line_height(scale)
+
+    def _runs(self, text: str) -> list[tuple[bool, str]]:
+        """Divide el texto en tramos (¿pixelado?, texto)."""
+        runs: list[tuple[bool, str]] = []
+        for ch in text:
+            pixel = ch in self.PIXEL_ONLY
+            if runs and runs[-1][0] == pixel:
+                runs[-1] = (pixel, runs[-1][1] + ch)
+            else:
+                runs.append((pixel, ch))
+        return runs
 
     def render(self, text: str, color, scale: int) -> pygame.Surface:
         key = (text, tuple(color), scale)
@@ -162,9 +176,16 @@ class SmoothFont:
         if surf is None:
             if len(self._cache) > 800:
                 self._cache.clear()
-            rendered = self._font(scale).render(text, True, color)
-            surf = pygame.Surface((max(1, rendered.get_width()), self.line_height(scale)), pygame.SRCALPHA)
-            surf.blit(rendered, (0, self.line_height(scale) - rendered.get_height()))
+            height = self.line_height(scale)
+            parts = [self.pixel.render(run, color, scale) if pixel else self._font(scale).render(run, True, color)
+                     for pixel, run in self._runs(text)]
+            gap = scale
+            width = sum(p.get_width() for p in parts) + gap * max(0, len(parts) - 1)
+            surf = pygame.Surface((max(1, width), height), pygame.SRCALPHA)
+            x = 0
+            for part in parts:
+                surf.blit(part, (x, height - part.get_height()))
+                x += part.get_width() + gap
             self._cache[key] = surf
         return surf
 
@@ -181,7 +202,7 @@ class Text:
     def font(self):
         if self.kind == "smooth":
             if self.smooth is None:
-                self.smooth = SmoothFont()
+                self.smooth = SmoothFont(self.pixel)
             return self.smooth
         return self.pixel
 

@@ -75,8 +75,8 @@ class GameRules:
     hold: bool = True
     next_count: int = 3             # 0-5 piezas visibles
     hard_drop: bool = True
-    lock_delay: int = 0             # 0 = como el NES: se fija al no poder caer
-    lock_resets: int = 15           # movimientos que reinician el retardo de fijado
+    lock_delay: int = 20            # margen mínimo apoyada (fotogramas); 0 = como el NES
+    lock_resets: int = 6            # movimientos apoyada que reinician ese margen
     das: int = 12                   # fotogramas antes de autorrepetir
     arr: int = 4                    # fotogramas entre repeticiones (0 = instantáneo)
     soft_drop_frames: int = 2       # fotogramas por fila con bajada suave
@@ -267,10 +267,9 @@ class Game:
         if soft:
             gravity = min(gravity, rules.soft_drop_frames)
         self._gravity_counter += 1
-        on_ground = not self.board.fits(self.piece_cells(dy=1))
         if self._gravity_counter >= gravity:
             self._gravity_counter = 0
-            if not on_ground:
+            if self.board.fits(self.piece_cells(dy=1)):
                 self.piece.y += 1
                 if soft:
                     self.score += 1
@@ -278,14 +277,13 @@ class Game:
                     self._lowest_y = self.piece.y
                     self._lock_timer = 0
                     self._lock_resets_used = 0
-                on_ground = not self.board.fits(self.piece_cells(dy=1))
-            elif rules.lock_delay <= 0:
-                self._lock()
-                return
 
-        if rules.lock_delay > 0 and on_ground:
+        if not self.board.fits(self.piece_cells(dy=1)):
+            # Apoyada: se fija tras lo que tardaría en caer otra fila (como el NES)
+            # o tras el margen mínimo `lock_delay`, lo que sea mayor. Así siempre hay
+            # tiempo para colarla en un hueco, incluso bajando rápido o a nivel alto.
             self._lock_timer += 1
-            if self._lock_timer >= rules.lock_delay:
+            if self._lock_timer >= max(gravity, rules.lock_delay):
                 self._lock()
 
     # --- acciones --------------------------------------------------------------
@@ -352,9 +350,6 @@ class Game:
         self.hold_used = False
         self._lock_row = max(y for _, y in cells)
         self.piece = None
-        if all(y < self.board.hidden for _, y in cells):
-            self._end("over")
-            return
         full = self.board.full_rows()
         if full:
             self.clearing_rows = full
@@ -363,14 +358,21 @@ class Game:
             self.timer = self.rules.line_clear_frames
             if self.timer <= 0:
                 self._finish_clear()
+        elif self._above_limit():
+            self._end("over")
         else:
             self._begin_entry_delay()
+
+    def _above_limit(self) -> bool:
+        """¿Queda algún bloque por encima de la zona visible? Entonces se pierde,
+        aunque solo sobresalga una parte de la pieza (p. ej. una I girada arriba)."""
+        return any(c is not None for row in self.board.cells[: self.board.hidden] for c in row)
 
     def _finish_clear(self) -> None:
         count = len(self.clearing_rows)
         self.board.clear_rows(self.clearing_rows)
         self.clearing_rows = []
-        self.score += LINE_SCORES[count] * (self.level + 1)
+        self.score += LINE_SCORES[min(count, 4)] * (self.level + 1)
         self.lines += count
         if count == 4:
             self.tetris_lines += 4
@@ -380,6 +382,9 @@ class Game:
             self.events.append("level_up")
         if self.goal is not None and self.lines >= self.goal:
             self._end("won")
+            return
+        if self._above_limit():
+            self._end("over")
             return
         self._begin_entry_delay()
 

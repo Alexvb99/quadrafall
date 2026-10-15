@@ -126,7 +126,7 @@ class GameScene(Scene):
         for text, frames, color in ([] if self.paused else self.popups):
             rise = (90 - frames) // 3
             txt.draw(surf, text, (layout.board.centerx, layout.board.y + 200 - rise), color, 4,
-                     align="center", shadow=darken(theme.board, 0.5))
+                     align="center", shadow=darken(theme.board, 0.5) if theme.ornaments else None)
 
         if game.finished and self.end_frames > CURTAIN_FRAMES:
             self._draw_results(surf)
@@ -136,7 +136,7 @@ class GameScene(Scene):
         theme, txt, game = app.theme, app.text, self.game
         board = self.layout.board
         veil = pygame.Surface((W, H), pygame.SRCALPHA)
-        veil.fill((0, 0, 0, 120))
+        veil.fill((*theme.background2, 150))
         surf.blit(veil, (0, 0))
         box = pygame.Rect(0, 0, 480, 330)
         box.center = (board.centerx, board.centery)
@@ -194,12 +194,12 @@ class PauseScene(MenuScene):
 
     def draw_background(self, surf) -> None:
         veil = pygame.Surface((W, H), pygame.SRCALPHA)
-        veil.fill((0, 0, 0, 140))
+        veil.fill((*self.app.theme.background2, 170))
         surf.blit(veil, (0, 0))
 
     def draw(self, surf) -> None:
         self.draw_background(surf)
         theme = self.app.theme
         self.app.text.draw(surf, t("paused"), (W // 2, 230), theme.text, 7, align="center",
-                           shadow=darken(theme.background2, 0.6))
+                           shadow=theme.shadow(0.6))
         self.draw_items(surf)

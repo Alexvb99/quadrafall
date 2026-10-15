@@ -194,6 +194,74 @@ def test_game_over_when_spawn_is_blocked():
     assert "game_over" in game.events or game.finished
 
 
+def _column_wall(game, top_row):
+    """Rellena la columna 0 desde `top_row` hasta abajo (sin completar líneas)."""
+    for y in range(top_row, game.board.height):
+        game.board.cells[y][0] = "L"
+
+
+def test_piece_sticking_out_above_the_limit_loses():
+    # Una I vertical que queda apoyada sobresaliendo por arriba (p. ej. girada en el
+    # último momento) debe acabar la partida aunque la siguiente pieza quepa.
+    game = make_game(rotation="nes")
+    _column_wall(game, game.board.hidden + 2)
+    game.piece = ActivePiece("I", 1, 0, 2)          # filas 0-3: dos de ellas ocultas
+    step(game, pressed={Action.HARD_DROP})
+    assert any(c is not None for row in game.board.cells[: game.board.hidden] for c in row)
+    assert game.state == "over"
+
+
+def test_piece_touching_the_top_row_but_visible_does_not_lose():
+    game = make_game(rotation="nes")
+    _column_wall(game, game.board.hidden + 4)
+    game.piece = ActivePiece("I", 1, 0, 2)          # cae hasta las filas 2-5, todas visibles
+    step(game, pressed={Action.HARD_DROP})
+    assert game.state != "over"
+
+
+def test_lines_cleared_can_save_a_piece_sticking_out():
+    # Si la pieza completa líneas y al bajar todo queda dentro, se sigue jugando.
+    game = make_game(rotation="nes")
+    board = game.board
+    for y in (board.hidden, board.hidden + 1):
+        board.cells[y] = [None] + ["J"] * 9
+    _column_wall(game, board.hidden + 2)
+    game.piece = ActivePiece("I", 1, 0, 2)          # filas 0-3: completa las filas 2 y 3
+    step(game, pressed={Action.HARD_DROP})
+    assert game.lines == 2
+    assert game.state != "over"
+
+
+def test_lock_grace_lets_you_slide_after_fast_drop():
+    game = make_game(lock_delay=20, soft_drop_frames=2)
+    game.piece.y += game.drop_distance()
+    kind = game.piece.kind
+    step(game, 19, held={Action.SOFT_DROP})
+    assert game.piece is not None and game.piece.kind == kind
+    step(game, 1, held={Action.SOFT_DROP})
+    assert sum(c is not None for row in game.board.cells for c in row) == 4
+
+
+def test_nes_soft_drop_locks_almost_immediately():
+    game = make_game(lock_delay=0, lock_resets=0, soft_drop_frames=2)
+    game.piece.y += game.drop_distance()
+    step(game, 2, held={Action.SOFT_DROP})
+    assert sum(c is not None for row in game.board.cells for c in row) == 4
+
+
+def test_moving_on_the_ground_resets_the_grace_a_limited_number_of_times():
+    game = make_game(lock_delay=20, lock_resets=2, das=100, start_level=19)
+    game.piece.y += game.drop_distance()
+    for direction in (Action.LEFT, Action.RIGHT):
+        step(game, 15)
+        step(game, 1, held={direction}, pressed={direction})   # reinicia el margen
+    step(game, 15)
+    assert game.piece is not None                                # sigue viva
+    step(game, 1, held={Action.LEFT}, pressed={Action.LEFT})    # ya no reinicia
+    step(game, 5)
+    assert sum(c is not None for row in game.board.cells for c in row) == 4
+
+
 def test_btype_ends_when_goal_reached():
     game = make_game(mode="btype", rotation="nes")
     game.lines = 24
