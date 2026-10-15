@@ -93,9 +93,48 @@ jobs:
             dist/quadrafall_*.deb
           if-no-files-found: error
 
+  arch:
+    # Paquete de pacman hecho con la misma carpeta que la AppImage y el .deb.
+    needs: linux
+    runs-on: ubuntu-latest
+    container: archlinux:base-devel
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/download-artifact@v8
+        with:
+          name: quadrafall-linux
+          path: dist
+      - name: Compilar el paquete de pacman
+        run: |
+          pacman -Syu --noconfirm --needed pacman-contrib
+          useradd -m builder
+          chown -R builder .
+          VERSION="$(sed -n 's/^__version__ = "\(.*\)"/\1/p' src/quadrafall/__init__.py)"
+          su builder -c "sh packaging/arch/build.sh $VERSION"
+      - name: Probar el paquete (instalar y arrancar el juego)
+        timeout-minutes: 5
+        env:
+          SDL_AUDIODRIVER: dummy
+        run: |
+          pacman -U --noconfirm dist/quadrafall-bin-*.pkg.tar.zst
+          pacman -S --noconfirm --needed xorg-server-xvfb
+          xvfb-run -a quadrafall --screenshot "$RUNNER_TEMP/prueba-arch.png"
+          test -s "$RUNNER_TEMP/prueba-arch.png"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: prueba-arch
+          path: ${{ runner.temp }}/prueba-arch.png
+      - uses: actions/upload-artifact@v7
+        with:
+          name: quadrafall-arch
+          path: |
+            dist/quadrafall-bin-*.pkg.tar.zst
+            dist/PKGBUILD
+          if-no-files-found: error
+
   release:
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: [windows, linux]
+    needs: [windows, linux, arch]
     runs-on: ubuntu-latest
     permissions:
       contents: write

@@ -1,0 +1,41 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Maintainer: Alexandru Voivod <alexandruvoivod@gmail.com>
+# Paquete de Arch Linux (pacman): reempaqueta la versión compilada que publica GitHub
+# (la misma carpeta que el .deb), en /opt/quadrafall con el comando "quadrafall".
+# El flujo de GitHub actualiza pkgver y las sumas en cada versión (packaging/arch/build.sh).
+
+pkgname=quadrafall-bin
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="Juego libre de bloques que caen, inspirado en Quadrapassel y en el clásico de NES"
+arch=(x86_64)
+url="https://github.com/Alexvb99/quadrafall"
+license=(GPL-3.0-or-later)
+depends=(glibc hicolor-icon-theme libx11 libxcursor libxext libxfixes libxi libxrandr)
+optdepends=('libpulse: sonido con PulseAudio o PipeWire'
+            'alsa-lib: sonido con ALSA')
+provides=(quadrafall)
+conflicts=(quadrafall)
+options=(!strip !debug)
+_appid=io.github.alexvb99.Quadrafall
+_raw="https://raw.githubusercontent.com/Alexvb99/quadrafall/v$pkgver/packaging/linux"
+source=("$url/releases/download/v$pkgver/Quadrafall-$pkgver-Linux-x86_64.tar.gz"
+        "$_appid-$pkgver.desktop::$_raw/$_appid.desktop"
+        "$_appid-$pkgver.png::$_raw/$_appid.png"
+        "$_appid-$pkgver.metainfo.xml::$_raw/$_appid.metainfo.xml")
+sha256sums=('fd94807585768223b441124ee6f85995c5d7dd982d4e2eb73485fc8718840afd'
+            '060fbcc5ef104db91a62888e6679ecee3ad5530e22007847906c29af5297fb78'
+            '47bcacc5bac759e14b811256f5fa32681d7c9aaec454b6872e36e81adbc65879'
+            'ff8e41a6ccde480e1a7f06f95bb1107c382687dfc34de5d07573e4b08f914efe')
+
+package() {
+  install -d "$pkgdir/opt" "$pkgdir/usr/bin"
+  cp -r Quadrafall "$pkgdir/opt/quadrafall"
+  chmod -R u=rwX,go=rX "$pkgdir/opt/quadrafall"
+  chmod 755 "$pkgdir/opt/quadrafall/Quadrafall"
+  ln -s /opt/quadrafall/Quadrafall "$pkgdir/usr/bin/quadrafall"
+  install -Dm644 "$_appid-$pkgver.desktop" "$pkgdir/usr/share/applications/$_appid.desktop"
+  install -Dm644 "$_appid-$pkgver.png" "$pkgdir/usr/share/icons/hicolor/256x256/apps/$_appid.png"
+  install -Dm644 "$_appid-$pkgver.metainfo.xml" "$pkgdir/usr/share/metainfo/$_appid.metainfo.xml"
+  install -Dm644 Quadrafall/LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}

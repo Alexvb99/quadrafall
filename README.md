@@ -15,10 +15,37 @@ caída instantánea y pieza fantasma. Funciona en **Windows y Linux**.
 | **Windows 10/11** | `Quadrafall-<versión>-Windows-Setup.exe` | Ábrelo y sigue el asistente (no pide permisos de administrador). |
 | **Linux** (cualquier distribución) | `Quadrafall-<versión>-Linux-x86_64.AppImage` | *Propiedades → Permitir ejecutar como programa* y ábrelo. |
 | **Ubuntu / Debian / Mint** | `quadrafall_<versión>_amd64.deb` | Ábrelo con el instalador de software o `sudo apt install ./quadrafall_<versión>_amd64.deb`. |
+| **Arch Linux / CachyOS / Manjaro / EndeavourOS** | `quadrafall-bin-<versión>-1-x86_64.pkg.tar.zst` | `sudo pacman -U ./quadrafall-bin-<versión>-1-x86_64.pkg.tar.zst` (detalles abajo). |
 
 El instalador de Windows no está firmado digitalmente: si aparece «Windows protegió su PC»,
 pulsa **Más información → Ejecutar de todas formas**. También hay versiones portátiles
 (`.zip` para Windows y `.tar.gz` para Linux) que no necesitan instalación.
+
+### Arch Linux y derivadas (pacman)
+
+El paquete `quadrafall-bin` instala el juego en `/opt/quadrafall`, con el comando `quadrafall`,
+entrada en el menú de aplicaciones e icono. Hay dos formas de instalarlo:
+
+**Con el paquete ya hecho** (descárgalo de la [última versión](https://github.com/Alexvb99/quadrafall/releases/latest)):
+
+```sh
+sudo pacman -U ./quadrafall-bin-<versión>-1-x86_64.pkg.tar.zst
+```
+
+**O construyéndolo con el `PKGBUILD`** (también está en la versión; comprueba las sumas sha256
+de lo que descarga):
+
+```sh
+sudo pacman -S --needed base-devel
+mkdir quadrafall && cd quadrafall
+curl -LO https://github.com/Alexvb99/quadrafall/releases/latest/download/PKGBUILD
+makepkg -si
+```
+
+- **Actualizar:** repite cualquiera de los dos pasos con la versión nueva.
+- **Desinstalar:** `sudo pacman -R quadrafall-bin` (los ajustes y récords de `~/.config/quadrafall`
+  y `~/.local/share/quadrafall` se conservan).
+- El juego usa X11 (en Wayland funciona a través de XWayland).
 
 ## Características
 
@@ -89,6 +116,7 @@ Pruebas del motor: `pip install -e ".[dev]"` y después `python -m pytest`.
 |---|---|---|
 | Windows | `powershell -ExecutionPolicy Bypass -File packaging\windows\build.ps1` | `Quadrafall-<versión>-Windows-Setup.exe` (requiere [Inno Setup 6](https://jrsoftware.org/isinfo.php)) y `Quadrafall-<versión>-Windows-Portable.zip` |
 | Linux | `sh packaging/linux/build.sh` | `Quadrafall-<versión>-Linux-x86_64.AppImage` (requiere [appimagetool](https://github.com/AppImage/appimagetool)), `quadrafall_<versión>_amd64.deb` y `.tar.gz` |
+| Arch Linux | `sh packaging/arch/build.sh <versión>` (después de `packaging/linux/build.sh`, en Arch con `base-devel` y `pacman-contrib`) | `quadrafall-bin-<versión>-1-x86_64.pkg.tar.zst` y su `PKGBUILD` |
 | Linux (Flatpak) | Ver las instrucciones dentro de `packaging/linux/io.github.alexvb99.Quadrafall.yml` | Paquete para Flathub |
 
 PyInstaller no compila de forma cruzada: lo de Windows se hace en Windows y lo de Linux en
@@ -96,7 +124,8 @@ Linux. En GitHub lo hace solo el flujo `.github/workflows/build.yml` en cada *pu
 
 **Publicar una versión nueva:** sube el número en `src/quadrafall/__init__.py` (`__version__`)
 y en `packaging/linux/io.github.alexvb99.Quadrafall.metainfo.xml`, haz commit y crea la
-etiqueta: `git tag v0.2.0` y `git push origin v0.2.0`. GitHub compila los instaladores y
+etiqueta: `git tag v0.2.0` y `git push origin v0.2.0`. GitHub compila los instaladores (también el paquete de Arch,
+con `pkgver` y las sumas actualizadas en su `PKGBUILD`) y
 publica la versión con las notas de `packaging/RELEASE_NOTES.md`.
 
 ## Dónde se guardan los datos
@@ -121,7 +150,7 @@ src/quadrafall/
   i18n.py        Textos en español e inglés
   audio.py       Efectos y música sintetizados
 tests/           Pruebas del motor (pytest)
-packaging/       PyInstaller, instalador de Windows, .desktop, AppStream y Flatpak
+packaging/       PyInstaller, instalador de Windows, .desktop, AppStream, Flatpak y PKGBUILD de Arch
 tools/           Generador del icono
 ```
 
