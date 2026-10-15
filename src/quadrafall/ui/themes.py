@@ -51,7 +51,6 @@ class Theme:
     nes_levels: bool = False    # colores que cambian con el nivel, como el NES
     pattern: str | None = None  # "bricks", "dots", "stripes" o None
     default_style: str = "bevel"
-    default_font: str = "pixel"
     shine: Color = (252, 252, 252)
     panel_border: int = 3       # grosor del borde de los paneles (0 = sin borde)
     frame_width: int = 4        # grosor del marco del tablero
@@ -113,7 +112,7 @@ THEMES: dict[str, Theme] = {
     "minimal": Theme(  # liso, en grises, sin bordes ni adornos
         key="minimal", background=(246, 246, 244), background2=(246, 246, 244), board=(246, 246, 244),
         grid=(238, 238, 236), frame=(205, 205, 202), panel=(246, 246, 244), text=(40, 40, 40),
-        text_dim=(150, 150, 148), accent=(40, 40, 40), default_style="flat", default_font="smooth",
+        text_dim=(150, 150, 148), accent=(40, 40, 40), default_style="flat",
         panel_border=0, frame_width=1, ornaments=False,
         pieces={"I": (45, 45, 45), "O": (150, 150, 150), "T": (85, 85, 85), "S": (120, 120, 120),
                 "Z": (100, 100, 100), "J": (65, 65, 65), "L": (135, 135, 135)},
@@ -121,7 +120,7 @@ THEMES: dict[str, Theme] = {
     "minimal_dark": Theme(  # el mismo tema en oscuro: grises invertidos sobre casi negro
         key="minimal_dark", background=(22, 22, 22), background2=(22, 22, 22), board=(22, 22, 22),
         grid=(30, 30, 30), frame=(62, 62, 62), panel=(22, 22, 22), text=(228, 228, 226),
-        text_dim=(118, 118, 116), accent=(228, 228, 226), default_style="flat", default_font="smooth",
+        text_dim=(118, 118, 116), accent=(228, 228, 226), default_style="flat",
         panel_border=0, frame_width=1, ornaments=False,
         pieces={"I": (225, 225, 225), "O": (120, 120, 120), "T": (185, 185, 185), "S": (150, 150, 150),
                 "Z": (170, 170, 170), "J": (205, 205, 205), "L": (135, 135, 135)},

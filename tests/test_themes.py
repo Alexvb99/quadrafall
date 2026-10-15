@@ -13,7 +13,6 @@ def test_theme_is_complete(key):
     assert theme.key == key
     assert has(f"theme_{key}"), "falta el nombre del tema en i18n.py"
     assert theme.default_style in BLOCK_STYLES
-    assert theme.default_font in ("pixel", "smooth")
     if not theme.nes_levels:
         assert set(theme.pieces) == set(PIECES)
 

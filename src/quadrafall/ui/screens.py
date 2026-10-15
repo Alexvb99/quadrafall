@@ -178,10 +178,9 @@ class AppearanceScene(OptionsSubScene):
         v = s.visual
 
         def set_theme(key):
-            # Cada tema trae su estilo de bloque y su fuente; luego se pueden cambiar.
+            # Cada tema trae su estilo de bloque (luego se puede cambiar). La fuente no se toca.
             s.set_visual("theme", key)
             s.set_visual("block_style", THEMES[key].default_style)
-            set_font(THEMES[key].default_font)
 
         def setter(key):
             return lambda value: s.set_visual(key, value)
@@ -194,7 +193,8 @@ class AppearanceScene(OptionsSubScene):
             Choice("theme", [(k, f"theme_{k}") for k in THEMES], lambda: v["theme"], set_theme),
             Choice("block_style", [(k, f"style_{k}") for k in BLOCK_STYLES], lambda: v["block_style"],
                    setter("block_style")),
-            Choice("font", [("pixel", "font_pixel"), ("smooth", "font_smooth")], lambda: v["font"], set_font),
+            Choice("font", [("pixel", "font_pixel"), ("rounded", "font_rounded"), ("smooth", "font_smooth")],
+                   lambda: v["font"], set_font),
             Toggle("grid", lambda: v["grid"], setter("grid")),
             Toggle("ghost", lambda: v["ghost"], setter("ghost")),
             Toggle("show_stats", lambda: v["show_stats"], setter("show_stats")),

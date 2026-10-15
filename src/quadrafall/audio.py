@@ -141,6 +141,7 @@ class Audio:
         self.sfx_volume = 0.7
         self.music_volume = 0.5
         self._want_music = False
+        self._music_pcm: bytes | None = None
         try:
             if not pygame.mixer.get_init():
                 pygame.mixer.init(44100, -16, 2, 512)
@@ -157,27 +158,38 @@ class Audio:
         synth = Synth(rate)
         self.sounds = {name: self._to_sound(data) for name, data in _sound_effects(synth).items()}
         self.set_volumes(self.sfx_volume, self.music_volume)
-        # La música tarda un poco en generarse: se hace en segundo plano.
+        # La música tarda un poco en generarse: se calcula en segundo plano, pero ese
+        # hilo no toca pygame (si el juego se cierra mientras tanto, pygame podría
+        # estar ya cerrado). El bucle principal la recoge en update().
         threading.Thread(target=self._build_music, daemon=True).start()
 
-    def _to_sound(self, samples: list[float]) -> pygame.mixer.Sound:
+    def _to_pcm(self, samples: list[float]) -> bytes:
         mono = array("h", [int(v * 32767) for v in samples])  # |v| < 1 en todos los sonidos
         if self.channels == 1:
-            data = mono
-        else:
-            data = array("h", bytes(2 * len(mono) * self.channels))
-            for ch in range(self.channels):
-                data[ch::self.channels] = mono
-        return pygame.mixer.Sound(buffer=data.tobytes())
+            return mono.tobytes()
+        data = array("h", bytes(2 * len(mono) * self.channels))
+        for ch in range(self.channels):
+            data[ch::self.channels] = mono
+        return data.tobytes()
+
+    def _to_sound(self, samples: list[float]) -> pygame.mixer.Sound:
+        return pygame.mixer.Sound(buffer=self._to_pcm(samples))
 
     def _build_music(self) -> None:
-        try:
-            self.music = self._to_sound(_music(Synth(self.rate)))
-            self.music.set_volume(self.music_volume)
+        """Hilo secundario: solo cálculo en Python puro."""
+        self._music_pcm = self._to_pcm(_music(Synth(self.rate)))
+
+    def update(self) -> None:
+        """Llamar en cada fotograma desde el hilo principal."""
+        if self.music is None and self._music_pcm is not None:
+            try:
+                self.music = pygame.mixer.Sound(buffer=self._music_pcm)
+                self.music.set_volume(self.music_volume)
+            except pygame.error:
+                self.enabled = False
+            self._music_pcm = None
             if self._want_music:
                 self.play_music()
-        except pygame.error:
-            self.music = None
 
     def set_volumes(self, sfx: float, music: float) -> None:
         self.sfx_volume, self.music_volume = sfx, music

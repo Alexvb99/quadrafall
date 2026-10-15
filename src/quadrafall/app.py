@@ -147,6 +147,7 @@ class App:
                 steps += 1
             if steps == MAX_STEPS_PER_FRAME:
                 accumulator = 0.0
+            self.audio.update()
             if self.toast:
                 self.toast = (self.toast[0], self.toast[1] - steps) if self.toast[1] > 0 else None
             if self.running:

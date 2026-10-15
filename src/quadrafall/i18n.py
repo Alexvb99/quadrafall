@@ -81,6 +81,7 @@ STRINGS: dict[str, tuple[str, str]] = {
     "style_outline": ("Contorno", "Outline"),
     "font": ("Fuente", "Font"),
     "font_pixel": ("Píxel", "Pixel"),
+    "font_rounded": ("Redondeada", "Rounded"),
     "font_smooth": ("Lisa", "Smooth"),
     "grid": ("Cuadrícula", "Grid"),
     "show_stats": ("Estadísticas de piezas", "Piece statistics"),

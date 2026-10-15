@@ -24,8 +24,9 @@ caída instantánea y pieza fantasma. Funciona en **Windows y Linux**.
 - **Modos**: Maratón (A), 25 líneas (B) y Sprint de 40 líneas.
 - **Filas prellenadas** con densidad configurable, como en Quadrapassel.
 - **Personalización visual**: 8 temas (NES con colores por nivel, Clásico Tango, Neón,
-  Portátil verde, Pastel, Minimalista claro y oscuro, y apto para daltonismo), 5 estilos de bloque, fuente
-  píxel o lisa, cuadrícula, animaciones, efecto CRT y vista previa en directo.
+  Portátil verde, Pastel, Minimalista claro y oscuro, y apto para daltonismo), 5 estilos de bloque,
+  3 fuentes (píxel de terminal *VT323* por defecto, redondeada *Varela Round* y lisa),
+  cuadrícula, animaciones, efecto CRT y vista previa en directo.
 - **Controles reasignables**: dos teclas y un botón de mando por acción. Mandos con cruceta o palanca.
 - **Sonido 8 bits generado por código** y música (*Korobeiniki*, canción popular de dominio público).
 - **Récords** locales por modo, **español e inglés**, pantalla completa (F11) y modo portátil.
@@ -101,7 +102,8 @@ Para el **modo portátil**, crea un archivo vacío `portable.txt` junto a `Quadr
 ```
 src/quadrafall/
   engine/        Reglas del juego, sin pygame (pieces, randomizer, board, game)
-  ui/            Dibujo, menús, entrada, temas y fuente pixelada
+  ui/            Dibujo, menús, entrada, temas y fuentes
+  assets/fonts/  Fuentes incluidas (VT323 y Varela Round) con sus licencias OFL
   app.py         Ventana, bucle a 60 Hz y pila de escenas
   settings.py    Ajustes y estilos predefinidos (NES, NES+, Moderno)
   i18n.py        Textos en español e inglés
@@ -114,6 +116,8 @@ tools/           Generador del icono
 - **Añadir un tema**: una entrada nueva en `THEMES` (`ui/themes.py`) y su nombre en `i18n.py` (`theme_<clave>`).
 - **Añadir un idioma**: su código en `LANGUAGES` y una columna más en `STRINGS` (`i18n.py`).
 - **Añadir un estilo de juego**: una entrada en `PRESETS` (`settings.py`).
+- **Añadir una fuente**: el `.ttf` y su licencia en `assets/fonts`, una entrada en `FONTS`
+  (`ui/font.py`) y su nombre en `i18n.py` (`font_<clave>`). Solo fuentes libres (p. ej. OFL).
 
 ## Licencia
 
@@ -124,6 +128,11 @@ no incluye código ni recursos de Quadrapassel.
 
 Todos los gráficos y sonidos se generan por código en este repositorio. La melodía
 *Korobeiniki* es una canción popular rusa del siglo XIX de dominio público; el arreglo es propio.
+
+Las fuentes [VT323](https://fonts.google.com/specimen/VT323) (© The VT323 Project Authors) y
+[Varela Round](https://fonts.google.com/specimen/Varela+Round) (© The Varela Round Project Authors)
+se distribuyen sin modificar bajo la licencia SIL Open Font License 1.1; sus textos están en
+`src/quadrafall/assets/fonts/`.
 
 Este proyecto no está afiliado a The Tetris Company ni a GNOME. «Tetris» es una marca
 registrada de The Tetris Company; por eso el juego no usa ese nombre.
