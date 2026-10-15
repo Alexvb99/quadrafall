@@ -15,8 +15,8 @@ jobs:
   windows:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.13"
       - name: Instalar Inno Setup
@@ -26,7 +26,22 @@ jobs:
         env:
           APP_URL: https://github.com/${{ github.repository }}
         run: ./packaging/windows/build.ps1
-      - uses: actions/upload-artifact@v4
+      - name: Probar el instalador (instalar y arrancar el juego)
+        timeout-minutes: 5
+        shell: pwsh
+        run: |
+          $setup = (Get-ChildItem dist\Quadrafall-*-Windows-Setup.exe).FullName
+          $dir = "$env:RUNNER_TEMP\quadrafall"
+          $shot = "$env:RUNNER_TEMP\prueba-windows.png"
+          Start-Process $setup -ArgumentList "/VERYSILENT", "/SUPPRESSMSGBOXES", "/CURRENTUSER", "/NORESTART", "/DIR=`"$dir`"" -Wait
+          $env:SDL_AUDIODRIVER = "dummy"
+          Start-Process "$dir\Quadrafall.exe" -ArgumentList "--screenshot", "`"$shot`"" -Wait
+          if (-not (Test-Path $shot)) { throw "El juego instalado no arrancó" }
+      - uses: actions/upload-artifact@v5
+        with:
+          name: prueba-windows
+          path: ${{ runner.temp }}/prueba-windows.png
+      - uses: actions/upload-artifact@v5
         with:
           name: quadrafall-windows
           path: |
@@ -38,8 +53,8 @@ jobs:
     # 22.04 para que los binarios funcionen también en distribuciones algo antiguas.
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.13"
       - name: Descargar appimagetool
@@ -54,7 +69,22 @@ jobs:
           SDL_AUDIODRIVER: dummy
           SDL_VIDEODRIVER: dummy
         run: sh packaging/linux/build.sh
-      - uses: actions/upload-artifact@v4
+      - name: Probar la AppImage y el .deb (arrancar el juego)
+        timeout-minutes: 5
+        env:
+          APPIMAGE_EXTRACT_AND_RUN: "1"
+          SDL_AUDIODRIVER: dummy
+        run: |
+          xvfb-run -a dist/Quadrafall-*-Linux-*.AppImage --screenshot "$RUNNER_TEMP/prueba-appimage.png"
+          sudo apt-get install -y ./dist/quadrafall_*.deb
+          xvfb-run -a quadrafall --screenshot "$RUNNER_TEMP/prueba-deb.png"
+          test -s "$RUNNER_TEMP/prueba-appimage.png"
+          test -s "$RUNNER_TEMP/prueba-deb.png"
+      - uses: actions/upload-artifact@v5
+        with:
+          name: prueba-linux
+          path: ${{ runner.temp }}/prueba-*.png
+      - uses: actions/upload-artifact@v5
         with:
           name: quadrafall-linux
           path: |
@@ -70,10 +100,11 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@v5
+      - uses: actions/download-artifact@v5
         with:
           path: artifacts
+          pattern: quadrafall-*   # solo las descargas, no las capturas de prueba
           merge-multiple: true
       - name: Preparar notas
         run: sed "s/{VERSION}/${GITHUB_REF_NAME#v}/g" packaging/RELEASE_NOTES.md > notes.md

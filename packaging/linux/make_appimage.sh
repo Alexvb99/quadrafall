@@ -16,13 +16,14 @@ fi
 
 APPDIR=build/AppDir
 rm -rf "$APPDIR"
-mkdir -p "$APPDIR/usr/lib" "$APPDIR/usr/share/applications" "$APPDIR/usr/share/icons/hicolor/256x256/apps"
+mkdir -p "$APPDIR/usr/lib" "$APPDIR/usr/share/applications" "$APPDIR/usr/share/icons/hicolor/256x256/apps" "$APPDIR/usr/share/metainfo"
 cp -r dist/Quadrafall "$APPDIR/usr/lib/quadrafall"
 cp "packaging/linux/$APP_ID.desktop" "$APPDIR/$APP_ID.desktop"
 cp "packaging/linux/$APP_ID.desktop" "$APPDIR/usr/share/applications/"
 cp "packaging/linux/$APP_ID.png" "$APPDIR/$APP_ID.png"
 cp "packaging/linux/$APP_ID.png" "$APPDIR/usr/share/icons/hicolor/256x256/apps/"
 ln -sf "$APP_ID.png" "$APPDIR/.DirIcon"
+cp "packaging/linux/$APP_ID.metainfo.xml" "$APPDIR/usr/share/metainfo/$APP_ID.appdata.xml"
 
 cat > "$APPDIR/AppRun" <<'EOF'
 #!/bin/sh

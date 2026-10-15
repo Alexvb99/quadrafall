@@ -43,5 +43,6 @@ Description: Falling-blocks puzzle with NES-style rules
 EOF
 
 OUT="dist/quadrafall_${VERSION}_${DEB_ARCH}.deb"
-dpkg-deb --build --root-owner-group "$PKG" "$OUT"
+# xz en lugar de zstd: lo instalan también versiones antiguas de dpkg (Debian).
+dpkg-deb -Zxz --build --root-owner-group "$PKG" "$OUT"
 echo "Listo: $OUT"
