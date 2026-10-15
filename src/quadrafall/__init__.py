@@ -3,4 +3,4 @@
 
 APP_NAME = "Quadrafall"
 APP_ID = "io.github.alexvb99.Quadrafall"
-__version__ = "0.1.0"
+__version__ = "0.1.1"

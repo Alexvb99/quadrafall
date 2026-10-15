@@ -68,7 +68,7 @@ makepkg -si
   cuadrícula, animaciones, efecto CRT y vista previa en directo.
 - **Controles reasignables**: dos teclas y un botón de mando por acción. Mandos con cruceta o palanca.
 - **Sonido 8 bits generado por código** y música (*Korobeiniki*, canción popular de dominio público).
-- **Récords** locales por modo, **español e inglés**, pantalla completa (F11) y modo portátil.
+- **Récords** locales por modo, **español e inglés**, ventana de cualquier tamaño (el juego se escala y se centra), pantalla completa (F11) y modo portátil.
 
 | | |
 |---|---|

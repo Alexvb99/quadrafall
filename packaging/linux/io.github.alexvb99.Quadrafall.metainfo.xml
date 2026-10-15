@@ -46,6 +46,9 @@
     <control>gamepad</control>
   </supports>
   <releases>
+    <release version="0.1.1" date="2026-10-15">
+      <description><p>La ventana se adapta a cualquier tamaño, también en gestores de ventanas en mosaico.</p></description>
+    </release>
     <release version="0.1.0" date="2026-10-15"/>
   </releases>
 </component>

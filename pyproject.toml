@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "quadrafall"
-version = "0.1.0"
+version = "0.1.1"
 description = "Juego libre de bloques que caen, inspirado en Quadrapassel y en el clásico de NES"
 readme = "README.md"
 license = "GPL-3.0-or-later"

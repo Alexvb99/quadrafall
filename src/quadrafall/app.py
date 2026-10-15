@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import os
 import sys
+import warnings
 
 os.environ.setdefault("PYGAME_HIDE_SUPPORT_PROMPT", "1")
 
@@ -55,14 +56,25 @@ class App:
     # --- ventana ---------------------------------------------------------------
 
     def _open_window(self) -> pygame.Surface:
-        flags = pygame.SCALED | pygame.RESIZABLE
+        """Abre una ventana normal y devuelve el lienzo fijo de W×H donde dibujan las escenas.
+
+        No se usa pygame.SCALED: en gestores de ventanas en mosaico (Niri, Sway...) la ventana
+        no aceptaba el tamaño que le daba el gestor. El lienzo se escala a la ventana en _present.
+        """
+        self.windowed_size = self._initial_window_size()
+        self._set_windowed()
+        self.viewport = pygame.Rect(0, 0, W, H)
+        return pygame.Surface((W, H)).convert()
+
+    @staticmethod
+    def _initial_window_size() -> tuple[int, int]:
+        # Tres cuartos del escritorio, con la proporción del juego.
         try:
-            screen = pygame.display.set_mode((W, H), flags, vsync=1)
-            self.vsync = True
-        except pygame.error:
-            screen = pygame.display.set_mode((W, H), flags)
-            self.vsync = False
-        return screen
+            dw, dh = pygame.display.get_desktop_sizes()[0]
+        except (pygame.error, IndexError):
+            return W, H
+        scale = min(dw * 0.75 / W, dh * 0.75 / H)
+        return max(320, round(W * scale)), max(180, round(H * scale))
 
     def _set_icon(self) -> None:
         try:
@@ -72,9 +84,20 @@ class App:
 
     def set_fullscreen(self, value: bool) -> None:
         self.settings.visual["fullscreen"] = value
-        if value != self.fullscreen:
-            pygame.display.toggle_fullscreen()
-            self.fullscreen = value
+        if value == self.fullscreen:
+            return
+        if value:
+            self.windowed_size = pygame.display.get_window_size()
+            pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+        else:
+            self._set_windowed()
+        self.fullscreen = value
+
+    def _set_windowed(self) -> None:
+        # Los gestores en mosaico imponen su tamaño: no es un error, el lienzo se adapta.
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", "Requested window was forcibly resized")
+            pygame.display.set_mode(self.windowed_size, pygame.RESIZABLE)
 
     @property
     def theme(self):
@@ -124,17 +147,10 @@ class App:
     def run(self) -> None:
         clock = pygame.time.Clock()
         accumulator = 0.0
-        cap = 0 if self.vsync else FPS
-        fast_frames = 0
         frame = 0
         while self.running:
-            dt = clock.tick(cap) / 1000.0
+            dt = clock.tick(FPS) / 1000.0
             frame += 1
-            # Si la sincronía vertical no funciona, limitamos a 60 fps para no gastar CPU.
-            if cap == 0 and frame < 120:
-                fast_frames += dt < 0.004
-                if fast_frames > 30:
-                    cap = FPS
             for event in pygame.event.get():
                 self._handle_event(event)
                 if not self.running:
@@ -162,7 +178,9 @@ class App:
         if event.type == pygame.QUIT:
             self.running = False
             return
-        name = self.input.handle_device_event(event)
+        if event.type in (pygame.MOUSEMOTION, pygame.MOUSEBUTTONDOWN, pygame.MOUSEBUTTONUP):
+            event = pygame.event.Event(event.type, {**event.dict, "pos": self._to_canvas(event.pos)})
+        name =self.input.handle_device_event(event)
         if name:
             self.show_toast(t("gamepad_connected", name=name[:28]))
         if event.type == pygame.KEYDOWN and (event.key == pygame.K_F11 or
@@ -184,7 +202,36 @@ class App:
         if self.toast:
             theme = self.theme
             self.text.draw(self.screen, self.toast[0], (W - 20, 16), theme.accent, 2, align="right")
+        self._present()
+
+    def _present(self) -> None:
+        """Escala el lienzo a la ventana, centrado y con bandas si la proporción no coincide."""
+        window = pygame.display.get_surface()
+        ww, wh = window.get_size()
+        scale = min(ww / W, wh / H)
+        size = (max(1, round(W * scale)), max(1, round(H * scale)))
+        view = pygame.Rect((0, 0), size)
+        view.center = (ww // 2, wh // 2)
+        self.viewport = view
+        bars = self.theme.background2
+        window.fill(bars, (0, 0, ww, view.top))
+        window.fill(bars, (0, view.bottom, ww, wh - view.bottom))
+        window.fill(bars, (0, view.top, view.left, view.height))
+        window.fill(bars, (view.right, view.top, ww - view.right, view.height))
+        if size == (W, H):
+            window.blit(self.screen, view)
+        elif scale == int(scale):
+            # Escala entera: píxeles nítidos y más rápido.
+            pygame.transform.scale(self.screen, size, window.subsurface(view))
+        else:
+            pygame.transform.smoothscale(self.screen, size, window.subsurface(view))
         pygame.display.flip()
+
+    def _to_canvas(self, pos: tuple[int, int]) -> tuple[int, int]:
+        """Pasa una posición del ratón en la ventana a coordenadas del lienzo."""
+        view = self.viewport
+        return ((pos[0] - view.x) * W // max(1, view.width),
+                (pos[1] - view.y) * H // max(1, view.height))
 
 
 def main() -> None:
