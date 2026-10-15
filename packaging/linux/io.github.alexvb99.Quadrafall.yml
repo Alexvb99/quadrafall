@@ -6,8 +6,8 @@
 #   flatpak-pip-generator --runtime org.freedesktop.Sdk//24.08 pygame-ce \
 #       --output packaging/linux/python3-pygame-ce
 # Compilar e instalar en local:
-#   flatpak-builder --user --install --force-clean build-flatpak packaging/linux/io.github.quadrafall.Quadrafall.yml
-id: io.github.quadrafall.Quadrafall
+#   flatpak-builder --user --install --force-clean build-flatpak packaging/linux/io.github.alexvb99.Quadrafall.yml
+id: io.github.alexvb99.Quadrafall
 runtime: org.freedesktop.Platform
 runtime-version: "24.08"
 sdk: org.freedesktop.Sdk
@@ -24,9 +24,9 @@ modules:
     buildsystem: simple
     build-commands:
       - pip3 install --no-deps --no-build-isolation --prefix=${FLATPAK_DEST} .
-      - install -Dm644 packaging/linux/io.github.quadrafall.Quadrafall.desktop -t ${FLATPAK_DEST}/share/applications
-      - install -Dm644 packaging/linux/io.github.quadrafall.Quadrafall.metainfo.xml -t ${FLATPAK_DEST}/share/metainfo
-      - install -Dm644 packaging/linux/io.github.quadrafall.Quadrafall.png ${FLATPAK_DEST}/share/icons/hicolor/256x256/apps/io.github.quadrafall.Quadrafall.png
+      - install -Dm644 packaging/linux/io.github.alexvb99.Quadrafall.desktop -t ${FLATPAK_DEST}/share/applications
+      - install -Dm644 packaging/linux/io.github.alexvb99.Quadrafall.metainfo.xml -t ${FLATPAK_DEST}/share/metainfo
+      - install -Dm644 packaging/linux/io.github.alexvb99.Quadrafall.png ${FLATPAK_DEST}/share/icons/hicolor/256x256/apps/io.github.alexvb99.Quadrafall.png
     sources:
       - type: dir
         path: ../..

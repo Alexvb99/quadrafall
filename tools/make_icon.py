@@ -17,7 +17,7 @@ import pygame  # noqa: E402
 ROOT = Path(__file__).resolve().parents[1]
 PNG_OUT = ROOT / "src" / "quadrafall" / "assets" / "icon.png"
 ICO_OUT = ROOT / "packaging" / "windows" / "icon.ico"
-LINUX_OUT = ROOT / "packaging" / "linux" / "io.github.quadrafall.Quadrafall.png"
+LINUX_OUT = ROOT / "packaging" / "linux" / "io.github.alexvb99.Quadrafall.png"
 
 BG = (28, 28, 40)
 FRAME = (124, 124, 140)

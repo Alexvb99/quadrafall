@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-# Pruebas y ejecutables para Windows y Linux en cada push.
-# Al subir una etiqueta "v*" (p. ej. v0.1.0) además se crea una versión (release) con los archivos.
+# Pruebas e instaladores para Windows y Linux en cada push.
+# Al subir una etiqueta "v*" (p. ej. v0.1.0) se publica además una versión (release)
+# con los instaladores y las notas de packaging/RELEASE_NOTES.md.
 name: build
 
 on:
@@ -8,47 +9,76 @@ on:
     branches: [main]
     tags: ["v*"]
   pull_request:
+  workflow_dispatch:
 
 jobs:
-  build:
-    strategy:
-      matrix:
-        include:
-          - os: windows-latest
-            artifact: dist/Quadrafall-*-windows.zip
-          - os: ubuntu-22.04
-            artifact: dist/Quadrafall-*-linux-*.tar.gz
-    runs-on: ${{ matrix.os }}
+  windows:
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.13"
-      - name: Compilar (Windows)
-        if: runner.os == 'Windows'
+      - name: Instalar Inno Setup
+        run: choco install innosetup --no-progress -y
+      - name: Compilar ejecutable e instalador
         shell: pwsh
-        run: ./packaging/windows/build.ps1
-      - name: Compilar (Linux)
-        if: runner.os == 'Linux'
         env:
+          APP_URL: https://github.com/${{ github.repository }}
+        run: ./packaging/windows/build.ps1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: quadrafall-windows
+          path: |
+            dist/Quadrafall-*-Windows-Setup.exe
+            dist/Quadrafall-*-Windows-Portable.zip
+          if-no-files-found: error
+
+  linux:
+    # 22.04 para que los binarios funcionen también en distribuciones algo antiguas.
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Descargar appimagetool
+        run: |
+          curl -sSfL -o "$RUNNER_TEMP/appimagetool" \
+            https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage
+          chmod +x "$RUNNER_TEMP/appimagetool"
+      - name: Compilar AppImage, .deb y .tar.gz
+        env:
+          APPIMAGETOOL: ${{ runner.temp }}/appimagetool
+          APPIMAGE_EXTRACT_AND_RUN: "1"
           SDL_AUDIODRIVER: dummy
+          SDL_VIDEODRIVER: dummy
         run: sh packaging/linux/build.sh
       - uses: actions/upload-artifact@v4
         with:
-          name: quadrafall-${{ runner.os }}
-          path: ${{ matrix.artifact }}
+          name: quadrafall-linux
+          path: |
+            dist/Quadrafall-*-Linux-*.AppImage
+            dist/Quadrafall-*-Linux-*.tar.gz
+            dist/quadrafall_*.deb
+          if-no-files-found: error
 
   release:
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: build
+    needs: [windows, linux]
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
+      - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
           path: artifacts
           merge-multiple: true
+      - name: Preparar notas
+        run: sed "s/{VERSION}/${GITHUB_REF_NAME#v}/g" packaging/RELEASE_NOTES.md > notes.md
       - uses: softprops/action-gh-release@v2
         with:
+          name: Quadrafall ${{ github.ref_name }}
+          body_path: notes.md
           files: artifacts/*

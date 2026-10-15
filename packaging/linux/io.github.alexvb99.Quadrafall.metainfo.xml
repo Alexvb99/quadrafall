@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- SPDX-License-Identifier: CC0-1.0 -->
 <component type="desktop-application">
-  <id>io.github.quadrafall.Quadrafall</id>
+  <id>io.github.alexvb99.Quadrafall</id>
   <name>Quadrafall</name>
   <summary>Falling-blocks puzzle with NES-style rules and modern options</summary>
   <summary xml:lang="es">Puzle de bloques que caen con reglas estilo NES y opciones modernas</summary>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0-or-later</project_license>
-  <developer id="io.github.quadrafall">
+  <developer id="io.github.alexvb99">
     <name>Quadrafall contributors</name>
   </developer>
   <description>
@@ -29,7 +29,17 @@
       <li>Spanish and English</li>
     </ul>
   </description>
-  <launchable type="desktop-id">io.github.quadrafall.Quadrafall.desktop</launchable>
+  <launchable type="desktop-id">io.github.alexvb99.Quadrafall.desktop</launchable>
+  <url type="homepage">https://github.com/Alexvb99/quadrafall</url>
+  <url type="bugtracker">https://github.com/Alexvb99/quadrafall/issues</url>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://raw.githubusercontent.com/Alexvb99/quadrafall/main/docs/partida-nes.png</image>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/Alexvb99/quadrafall/main/docs/partida-minimalista-oscuro.png</image>
+    </screenshot>
+  </screenshots>
   <content_rating type="oars-1.1"/>
   <supports>
     <control>keyboard</control>

@@ -1,7 +1,11 @@
 #!/usr/bin/env sh
 # SPDX-License-Identifier: GPL-3.0-or-later
-# Compila Quadrafall para Linux con PyInstaller.
-#   Resultado: dist/Quadrafall/Quadrafall  y  dist/Quadrafall-<versión>-linux-x86_64.tar.gz
+# Compila Quadrafall para Linux.
+#   dist/Quadrafall/Quadrafall                       (carpeta del programa)
+#   dist/Quadrafall-<versión>-Linux-<arq>.tar.gz     (sin instalar)
+#   dist/Quadrafall-<versión>-Linux-<arq>.AppImage   (si hay appimagetool)
+#   dist/quadrafall_<versión>_<arq>.deb              (si hay dpkg-deb)
+# Variable opcional: APPIMAGETOOL = ruta de appimagetool.
 set -eu
 cd "$(dirname "$0")/../.."
 
@@ -13,7 +17,11 @@ if [ -x .venv/bin/python ]; then PYTHON=.venv/bin/python; fi
 "$PYTHON" -m PyInstaller --noconfirm --clean packaging/quadrafall.spec
 
 VERSION="$("$PYTHON" -c 'import sys; sys.path.insert(0, "src"); import quadrafall; print(quadrafall.__version__)')"
+ARCH="$(uname -m)"
 cp LICENSE README.md dist/Quadrafall/
-cp packaging/linux/io.github.quadrafall.Quadrafall.desktop packaging/linux/io.github.quadrafall.Quadrafall.png dist/Quadrafall/
-tar -C dist -czf "dist/Quadrafall-$VERSION-linux-$(uname -m).tar.gz" Quadrafall
-echo "Listo: dist/Quadrafall-$VERSION-linux-$(uname -m).tar.gz"
+
+tar -C dist -czf "dist/Quadrafall-$VERSION-Linux-$ARCH.tar.gz" Quadrafall
+echo "Listo: dist/Quadrafall-$VERSION-Linux-$ARCH.tar.gz"
+
+sh packaging/linux/make_appimage.sh "$VERSION"
+sh packaging/linux/make_deb.sh "$VERSION"

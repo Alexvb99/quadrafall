@@ -4,9 +4,21 @@ Juego libre de bloques que caen, inspirado en **Quadrapassel** (GNOME) y en las 
 clásico de **NES**, con mejoras modernas opcionales: guardar pieza, varias piezas siguientes,
 caída instantánea y pieza fantasma. Funciona en **Windows y Linux**.
 
-> *Quadrafall* es un nombre provisional; se cambia en `src/quadrafall/__init__.py` (`APP_NAME`).
-
 ![Partida con el tema NES](docs/partida-nes.png)
+
+## Descargar
+
+### [⬇ Descargar la última versión](https://github.com/Alexvb99/quadrafall/releases/latest)
+
+| Sistema | Archivo que debes descargar | Cómo instalarlo |
+|---|---|---|
+| **Windows 10/11** | `Quadrafall-<versión>-Windows-Setup.exe` | Ábrelo y sigue el asistente (no pide permisos de administrador). |
+| **Linux** (cualquier distribución) | `Quadrafall-<versión>-Linux-x86_64.AppImage` | *Propiedades → Permitir ejecutar como programa* y ábrelo. |
+| **Ubuntu / Debian / Mint** | `quadrafall_<versión>_amd64.deb` | Ábrelo con el instalador de software o `sudo apt install ./quadrafall_<versión>_amd64.deb`. |
+
+El instalador de Windows no está firmado digitalmente: si aparece «Windows protegió su PC»,
+pulsa **Más información → Ejecutar de todas formas**. También hay versiones portátiles
+(`.zip` para Windows y `.tar.gz` para Linux) que no necesitan instalación.
 
 ## Características
 
@@ -71,21 +83,21 @@ python3 -m venv .venv
 
 Pruebas del motor: `pip install -e ".[dev]"` y después `python -m pytest`.
 
-## Crear ejecutables para publicar
+## Crear los instaladores
 
-| Plataforma | Comando | Resultado |
+| Plataforma | Comando | Resultado en `dist/` |
 |---|---|---|
-| Windows | `powershell -ExecutionPolicy Bypass -File packaging\windows\build.ps1` | `dist\Quadrafall-<versión>-windows.zip` |
-| Windows (instalador) | Compilar `packaging\windows\installer.iss` con [Inno Setup](https://jrsoftware.org/isinfo.php) tras el paso anterior | `dist\Quadrafall-<versión>-setup.exe` |
-| Linux | `sh packaging/linux/build.sh` | `dist/Quadrafall-<versión>-linux-x86_64.tar.gz` |
-| Linux (Flatpak) | Ver las instrucciones dentro de `packaging/linux/io.github.quadrafall.Quadrafall.yml` | Paquete para Flathub |
+| Windows | `powershell -ExecutionPolicy Bypass -File packaging\windows\build.ps1` | `Quadrafall-<versión>-Windows-Setup.exe` (requiere [Inno Setup 6](https://jrsoftware.org/isinfo.php)) y `Quadrafall-<versión>-Windows-Portable.zip` |
+| Linux | `sh packaging/linux/build.sh` | `Quadrafall-<versión>-Linux-x86_64.AppImage` (requiere [appimagetool](https://github.com/AppImage/appimagetool)), `quadrafall_<versión>_amd64.deb` y `.tar.gz` |
+| Linux (Flatpak) | Ver las instrucciones dentro de `packaging/linux/io.github.alexvb99.Quadrafall.yml` | Paquete para Flathub |
 
-PyInstaller no compila de forma cruzada: el ejecutable de Windows se hace en Windows y el de
-Linux en Linux. Si subes el proyecto a GitHub, el flujo `.github/workflows/build.yml` compila
-ambos automáticamente y, al crear una etiqueta `v0.1.0`, publica una *release* con los dos archivos.
+PyInstaller no compila de forma cruzada: lo de Windows se hace en Windows y lo de Linux en
+Linux. En GitHub lo hace solo el flujo `.github/workflows/build.yml` en cada *push*.
 
-El identificador `io.github.quadrafall.Quadrafall` debe coincidir con tu cuenta u organización
-de GitHub (`io.github.<usuario>.Quadrafall`) si quieres publicarlo en Flathub.
+**Publicar una versión nueva:** sube el número en `src/quadrafall/__init__.py` (`__version__`)
+y en `packaging/linux/io.github.alexvb99.Quadrafall.metainfo.xml`, haz commit y crea la
+etiqueta: `git tag v0.2.0` y `git push origin v0.2.0`. GitHub compila los instaladores y
+publica la versión con las notas de `packaging/RELEASE_NOTES.md`.
 
 ## Dónde se guardan los datos
 
@@ -115,6 +127,7 @@ tools/           Generador del icono
 
 - **Añadir un tema**: una entrada nueva en `THEMES` (`ui/themes.py`) y su nombre en `i18n.py` (`theme_<clave>`).
 - **Añadir un idioma**: su código en `LANGUAGES` y una columna más en `STRINGS` (`i18n.py`).
+- **Cambiar el nombre del juego**: `APP_NAME` en `src/quadrafall/__init__.py`.
 - **Añadir un estilo de juego**: una entrada en `PRESETS` (`settings.py`).
 - **Añadir una fuente**: el `.ttf` y su licencia en `assets/fonts`, una entrada en `FONTS`
   (`ui/font.py`) y su nombre en `i18n.py` (`font_<clave>`). Solo fuentes libres (p. ej. OFL).

@@ -19,6 +19,10 @@ classifiers = [
     "Topic :: Games/Entertainment :: Puzzle Games",
 ]
 
+[project.urls]
+Homepage = "https://github.com/Alexvb99/quadrafall"
+Issues = "https://github.com/Alexvb99/quadrafall/issues"
+
 [project.optional-dependencies]
 dev = ["pytest>=8", "pyinstaller>=6"]
 
