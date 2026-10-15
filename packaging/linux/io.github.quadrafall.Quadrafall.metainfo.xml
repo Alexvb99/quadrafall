@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SPDX-License-Identifier: CC0-1.0 -->
+<component type="desktop-application">
+  <id>io.github.quadrafall.Quadrafall</id>
+  <name>Quadrafall</name>
+  <summary>Falling-blocks puzzle with NES-style rules and modern options</summary>
+  <summary xml:lang="es">Puzle de bloques que caen con reglas estilo NES y opciones modernas</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  <developer id="io.github.quadrafall">
+    <name>Quadrafall contributors</name>
+  </developer>
+  <description>
+    <p>
+      A free falling-blocks puzzle inspired by GNOME Quadrapassel and the NES classic:
+      NES speeds, scoring and level progression, plus optional modern touches such as
+      hold, several next pieces, hard drop and a ghost piece.
+    </p>
+    <p xml:lang="es">
+      Un puzle libre de bloques que caen inspirado en Quadrapassel de GNOME y en el clásico de NES:
+      velocidades, puntuación y niveles del NES, con mejoras modernas opcionales como guardar pieza,
+      varias piezas siguientes, caída instantánea y pieza fantasma.
+    </p>
+    <ul>
+      <li>Marathon, 25-line and 40-line sprint modes</li>
+      <li>NES, NES with kicks and SRS rotation systems</li>
+      <li>Six colour themes and five block styles</li>
+      <li>Fully remappable keyboard and gamepad controls</li>
+      <li>Spanish and English</li>
+    </ul>
+  </description>
+  <launchable type="desktop-id">io.github.quadrafall.Quadrafall.desktop</launchable>
+  <content_rating type="oars-1.1"/>
+  <supports>
+    <control>keyboard</control>
+    <control>gamepad</control>
+  </supports>
+  <releases>
+    <release version="0.1.0" date="2026-10-15"/>
+  </releases>
+</component>

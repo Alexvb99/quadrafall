@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=Quadrafall
+GenericName=Falling blocks game
+GenericName[es]=Juego de bloques que caen
+Comment=Free falling-blocks puzzle inspired by Quadrapassel and the NES classic
+Comment[es]=Puzle libre de bloques que caen inspirado en Quadrapassel y en el clásico de NES
+Exec=quadrafall
+Icon=io.github.quadrafall.Quadrafall
+Terminal=false
+Categories=Game;BlocksGame;
+Keywords=blocks;puzzle;falling;quadrapassel;nes;
+StartupWMClass=Quadrafall

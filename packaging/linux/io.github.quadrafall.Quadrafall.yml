@@ -1,0 +1,32 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Manifiesto de Flatpak (base para publicar en Flathub).
+#
+# Antes de compilar hay que generar el módulo de dependencias de Python:
+#   pip install flatpak-pip-generator   (o descarga el script de flatpak-builder-tools)
+#   flatpak-pip-generator --runtime org.freedesktop.Sdk//24.08 pygame-ce \
+#       --output packaging/linux/python3-pygame-ce
+# Compilar e instalar en local:
+#   flatpak-builder --user --install --force-clean build-flatpak packaging/linux/io.github.quadrafall.Quadrafall.yml
+id: io.github.quadrafall.Quadrafall
+runtime: org.freedesktop.Platform
+runtime-version: "24.08"
+sdk: org.freedesktop.Sdk
+command: quadrafall
+finish-args:
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --share=ipc
+  - --device=all          # mandos
+  - --socket=pulseaudio
+modules:
+  - python3-pygame-ce.json
+  - name: quadrafall
+    buildsystem: simple
+    build-commands:
+      - pip3 install --no-deps --no-build-isolation --prefix=${FLATPAK_DEST} .
+      - install -Dm644 packaging/linux/io.github.quadrafall.Quadrafall.desktop -t ${FLATPAK_DEST}/share/applications
+      - install -Dm644 packaging/linux/io.github.quadrafall.Quadrafall.metainfo.xml -t ${FLATPAK_DEST}/share/metainfo
+      - install -Dm644 packaging/linux/io.github.quadrafall.Quadrafall.png ${FLATPAK_DEST}/share/icons/hicolor/256x256/apps/io.github.quadrafall.Quadrafall.png
+    sources:
+      - type: dir
+        path: ../..

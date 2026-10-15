@@ -1,0 +1,9 @@
+# Finales de línea coherentes entre Windows y Linux
+* text=auto
+*.sh text eol=lf
+*.desktop text eol=lf
+*.yml text eol=lf
+*.ps1 text eol=crlf
+*.iss text eol=crlf
+*.png binary
+*.ico binary
