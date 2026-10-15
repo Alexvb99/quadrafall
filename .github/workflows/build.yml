@@ -37,11 +37,11 @@ jobs:
           $env:SDL_AUDIODRIVER = "dummy"
           Start-Process "$dir\Quadrafall.exe" -ArgumentList "--screenshot", "`"$shot`"" -Wait
           if (-not (Test-Path $shot)) { throw "El juego instalado no arrancó" }
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v7
         with:
           name: prueba-windows
           path: ${{ runner.temp }}/prueba-windows.png
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v7
         with:
           name: quadrafall-windows
           path: |
@@ -80,11 +80,11 @@ jobs:
           xvfb-run -a quadrafall --screenshot "$RUNNER_TEMP/prueba-deb.png"
           test -s "$RUNNER_TEMP/prueba-appimage.png"
           test -s "$RUNNER_TEMP/prueba-deb.png"
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v7
         with:
           name: prueba-linux
           path: ${{ runner.temp }}/prueba-*.png
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v7
         with:
           name: quadrafall-linux
           path: |
@@ -101,7 +101,7 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v8
         with:
           path: artifacts
           pattern: quadrafall-*   # solo las descargas, no las capturas de prueba
