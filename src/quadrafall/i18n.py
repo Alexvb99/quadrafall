@@ -71,6 +71,7 @@ STRINGS: dict[str, tuple[str, str]] = {
     "theme_gameboy": ("Portátil verde", "Green handheld"),
     "theme_pastel": ("Pastel", "Pastel"),
     "theme_minimal": ("Minimalista", "Minimal"),
+    "theme_minimal_dark": ("Minimalista oscuro", "Minimal dark"),
     "theme_colorblind": ("Apto para daltonismo", "Colorblind-friendly"),
     "block_style": ("Estilo de bloque", "Block style"),
     "style_nes": ("NES", "NES"),

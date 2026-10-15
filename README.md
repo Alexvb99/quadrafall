@@ -23,8 +23,8 @@ caída instantánea y pieza fantasma. Funciona en **Windows y Linux**.
   por encima del límite (por ejemplo, una I girada en el último momento).
 - **Modos**: Maratón (A), 25 líneas (B) y Sprint de 40 líneas.
 - **Filas prellenadas** con densidad configurable, como en Quadrapassel.
-- **Personalización visual**: 7 temas (NES con colores por nivel, Clásico Tango, Neón,
-  Portátil verde, Pastel, Minimalista y apto para daltonismo), 5 estilos de bloque, fuente
+- **Personalización visual**: 8 temas (NES con colores por nivel, Clásico Tango, Neón,
+  Portátil verde, Pastel, Minimalista claro y oscuro, y apto para daltonismo), 5 estilos de bloque, fuente
   píxel o lisa, cuadrícula, animaciones, efecto CRT y vista previa en directo.
 - **Controles reasignables**: dos teclas y un botón de mando por acción. Mandos con cruceta o palanca.
 - **Sonido 8 bits generado por código** y música (*Korobeiniki*, canción popular de dominio público).
@@ -33,7 +33,7 @@ caída instantánea y pieza fantasma. Funciona en **Windows y Linux**.
 | | |
 |---|---|
 | ![Apariencia](docs/apariencia.png) | ![Tema Neón](docs/partida-neon.png) |
-| ![Tema Minimalista](docs/partida-minimalista.png) | |
+| ![Tema Minimalista](docs/partida-minimalista.png) | ![Tema Minimalista oscuro](docs/partida-minimalista-oscuro.png) |
 
 ## Controles por defecto
 

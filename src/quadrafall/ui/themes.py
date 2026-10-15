@@ -118,6 +118,14 @@ THEMES: dict[str, Theme] = {
         pieces={"I": (45, 45, 45), "O": (150, 150, 150), "T": (85, 85, 85), "S": (120, 120, 120),
                 "Z": (100, 100, 100), "J": (65, 65, 65), "L": (135, 135, 135)},
     ),
+    "minimal_dark": Theme(  # el mismo tema en oscuro: grises invertidos sobre casi negro
+        key="minimal_dark", background=(22, 22, 22), background2=(22, 22, 22), board=(22, 22, 22),
+        grid=(30, 30, 30), frame=(62, 62, 62), panel=(22, 22, 22), text=(228, 228, 226),
+        text_dim=(118, 118, 116), accent=(228, 228, 226), default_style="flat", default_font="smooth",
+        panel_border=0, frame_width=1, ornaments=False,
+        pieces={"I": (225, 225, 225), "O": (120, 120, 120), "T": (185, 185, 185), "S": (150, 150, 150),
+                "Z": (170, 170, 170), "J": (205, 205, 205), "L": (135, 135, 135)},
+    ),
     "colorblind": Theme(  # paleta Okabe-Ito, distinguible con daltonismo
         key="colorblind", background=(30, 30, 30), background2=(12, 12, 12), board=(0, 0, 0),
         grid=(40, 40, 40), frame=(200, 200, 200), panel=(0, 0, 0), text=(255, 255, 255),
