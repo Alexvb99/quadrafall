@@ -5,7 +5,7 @@
 # El flujo de GitHub actualiza pkgver y las sumas en cada versión (packaging/arch/build.sh).
 
 pkgname=quadrafall-bin
-pkgver=0.1.0
+pkgver=0.1.1
 pkgrel=1
 pkgdesc="Juego libre de bloques que caen, inspirado en Quadrapassel y en el clásico de NES"
 arch=(x86_64)
@@ -23,10 +23,10 @@ source=("$url/releases/download/v$pkgver/Quadrafall-$pkgver-Linux-x86_64.tar.gz"
         "$_appid-$pkgver.desktop::$_raw/$_appid.desktop"
         "$_appid-$pkgver.png::$_raw/$_appid.png"
         "$_appid-$pkgver.metainfo.xml::$_raw/$_appid.metainfo.xml")
-sha256sums=('fd94807585768223b441124ee6f85995c5d7dd982d4e2eb73485fc8718840afd'
+sha256sums=('f6b6c218b768b04a81b257f5298f4b6378fc795254f9b0074dc1a8033fbf7679'
             '060fbcc5ef104db91a62888e6679ecee3ad5530e22007847906c29af5297fb78'
             '47bcacc5bac759e14b811256f5fa32681d7c9aaec454b6872e36e81adbc65879'
-            'ff8e41a6ccde480e1a7f06f95bb1107c382687dfc34de5d07573e4b08f914efe')
+            '1694d8f79cd7cc7df9baee95279c2c0a6b2e869ee791fb63205a024bcce726a8')
 
 package() {
   install -d "$pkgdir/opt" "$pkgdir/usr/bin"
